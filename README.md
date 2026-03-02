@@ -1,3 +1,4 @@
+[![Board Status](https://dev.azure.com/Hyrule-Nexus/34d7e7bf-7b28-47e9-89f9-4c9feca13c2e/4641a0af-9862-4ad2-ae5b-964391b03f8e/_apis/work/boardbadge/eadee5f6-8cba-4870-b32b-470ab5d14df3)](https://dev.azure.com/Hyrule-Nexus/34d7e7bf-7b28-47e9-89f9-4c9feca13c2e/_boards/board/t/4641a0af-9862-4ad2-ae5b-964391b03f8e/Microsoft.RequirementCategory)
 # BlazorApp-Training
 Proyecto de práctica para aprender a usar Git y GitHub desde Windows y Visual Studio.
 
