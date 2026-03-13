@@ -15,8 +15,10 @@
 
 <body>
     <Routes />
- <script src="_framework/blazor.web.js"></script>
+<script src="_framework/blazor.web.js"></script>
 <script>
+    let matrixInterval = null;
+
     function startMatrix() {
         const canvas = document.getElementById('matrix-canvas');
         if (!canvas) {
@@ -24,8 +26,9 @@
             return;
         }
 
-        const ctx = canvas.getContext('2d');
+        if (matrixInterval) clearInterval(matrixInterval);
 
+        const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
@@ -37,7 +40,7 @@
         const fontSize = 16;
         const columns = Math.floor(canvas.width / fontSize);
         const drops = Array(columns).fill(1);
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$%^&*()';
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
 
         function draw() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
@@ -57,10 +60,13 @@
             });
         }
 
-        setInterval(draw, 35);
+        matrixInterval = setInterval(draw, 35);
     }
 
     document.addEventListener('DOMContentLoaded', startMatrix);
+
+    // Esto hace que se reinicie en cada navegación de Blazor
+    Blazor.addEventListener('enhancedload', startMatrix);
 </script>
 </body>
 
