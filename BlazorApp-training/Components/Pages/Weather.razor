@@ -52,25 +52,49 @@ else
     {
         try
         {
-            // Busca stories de seguridad en HackerNews
-            var searchUrl = "https://hn.algolia.com/api/v1/search?query=data+breach+hack+security&tags=story&hitsPerPage=15";
+            var searchUrl = "https://hn.algolia.com/api/v1/search?query=data+breach+hack+security&tags=story&hitsPerPage=20";
             var result = await Http.GetFromJsonAsync<HNSearchResult>(searchUrl);
 
-            stories = result?.Hits?.Select((h, i) => new HNStory
+            // Verifica cada URL antes de mostrarla
+            var validStories = new List<HNStory>();
+            int index = 1;
+
+            foreach (var h in result?.Hits ?? [])
             {
-                Index = i + 1,
-                Title = h.Title ?? "Unknown",
-                Url = h.Url ?? "",
-                Score = h.Points
-            }).ToList();
+                if (!string.IsNullOrEmpty(h.Url))
+                {
+                    try
+                    {
+                        var response = await Http.SendAsync(
+                            new HttpRequestMessage(HttpMethod.Head, h.Url)
+                        );
+
+                        if (!response.IsSuccessStatusCode) continue; // ← salta 404s
+                    }
+                    catch
+                    {
+                        continue; // ← salta URLs que no responden
+                    }
+                }
+
+                validStories.Add(new HNStory
+                {
+                    Index = index++,
+                    Title = h.Title ?? "Unknown",
+                    Url = h.Url ?? "",
+                    Score = h.Points
+                });
+            }
+
+            stories = validStories;
         }
-        catch
-        {
-            stories = new List<HNStory>
+            catch
+            {
+                stories = new List<HNStory>
             {
                 new HNStory { Index = 1, Title = "[ ERROR: Connection to darkweb lost ]", Score = 0 }
             };
-        }
+          }
     }
 
     private class HNSearchResult
