@@ -1,35 +1,44 @@
 ﻿@page "/weather"
 @attribute [StreamRendering]
+@inject HttpClient Http
 
-<PageTitle>Weather not channel</PageTitle>
+<PageTitle>Live Breach Feed</PageTitle>
 
-<h1>Weather</h1>
+<h1>⚠ Live Threat Intelligence</h1>
+<p>Latest cybersecurity incidents and data breaches from the web.</p>
 
-<p>This component demonstrates showing data.</p>
-
-@if (forecasts == null)
+@if (stories == null)
 {
-    <p><em>Loading...</em></p>
+    <p><em>[ SCANNING DARKWEB... ]</em></p>
 }
 else
 {
-    <table class="table">
+    <table class="table breach-table">
         <thead>
             <tr>
-                <th>Date</th>
-                <th aria-label="Temperature in Celsius">Temp. (C)</th>
-                <th aria-label="Temperature in Farenheit">Temp. (F)</th>
-                <th>Summary</th>
+                <th>#</th>
+                <th>Incident</th>
+                <th>Score</th>
+                <th>Source</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            @foreach (var story in stories)
             {
                 <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
+                    <td>@story.Index</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(story.Url))
+                        {
+                            <a href="@story.Url" target="_blank">@story.Title</a>
+                        }
+                        else
+                        {
+                            @story.Title
+                        }
+                    </td>
+                    <td>@story.Score</td>
+                    <td>@(string.IsNullOrEmpty(story.Url) ? "HN" : new Uri(story.Url).Host)</td>
                 </tr>
             }
         </tbody>
@@ -37,28 +46,54 @@ else
 }
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private List<HNStory>? stories;
 
     protected override async Task OnInitializedAsync()
     {
-        // Simulate asynchronous loading to demonstrate streaming rendering
-        await Task.Delay(500);
-
-        var startDate = DateOnly.FromDateTime(DateTime.Now);
-        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        try
         {
-            Date = startDate.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = summaries[Random.Shared.Next(summaries.Length)]
-        }).ToArray();
+            // Busca stories de seguridad en HackerNews
+            var searchUrl = "https://hn.algolia.com/api/v1/search?query=data+breach+hack+security&tags=story&hitsPerPage=15";
+            var result = await Http.GetFromJsonAsync<HNSearchResult>(searchUrl);
+
+            stories = result?.Hits?.Select((h, i) => new HNStory
+            {
+                Index = i + 1,
+                Title = h.Title ?? "Unknown",
+                Url = h.Url ?? "",
+                Score = h.Points
+            }).ToList();
+        }
+        catch
+        {
+            stories = new List<HNStory>
+            {
+                new HNStory { Index = 1, Title = "[ ERROR: Connection to darkweb lost ]", Score = 0 }
+            };
+        }
     }
 
-    private class WeatherForecast
+    private class HNSearchResult
     {
-        public DateOnly Date { get; set; }
-        public int TemperatureC { get; set; }
-        public string? Summary { get; set; }
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        [System.Text.Json.Serialization.JsonPropertyName("hits")]
+        public List<HNHit>? Hits { get; set; }
+    }
+
+    private class HNHit
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("title")]
+        public string? Title { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("url")]
+        public string? Url { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("points")]
+        public int Points { get; set; }
+    }
+
+    private class HNStory
+    {
+        public int Index { get; set; }
+        public string Title { get; set; } = "";
+        public string Url { get; set; } = "";
+        public int Score { get; set; }
     }
 }

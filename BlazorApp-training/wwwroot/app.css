@@ -13,7 +13,7 @@ a, .btn-link {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 .content {
@@ -58,6 +58,8 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* ===== MATRIX THEME ===== */
 #matrix-canvas {
     position: fixed;
     top: 0;
@@ -86,3 +88,48 @@ article.content {
 a {
     color: #00ff41 !important;
 }
+
+/* ===== BREACH TABLE ===== */
+table, table thead, table tbody, table tr, table td, table th {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+table {
+    color: #00ff41;
+    border-color: #00ff41;
+}
+
+thead th {
+    color: #ffffff;
+    border-bottom: 1px solid #00ff41;
+}
+
+tbody tr {
+    background: rgba(0, 0, 0, 0.6) !important;
+}
+
+    tbody tr:hover {
+        background: rgba(0, 255, 65, 0.1) !important;
+    }
+
+    tbody tr td {
+        font-family: monospace;
+        color: #00ff41;
+        border-color: #1a1a1a !important;
+    }
+    body {
+        color: #00ff41 !important;
+    }
+
+    tbody tr td, tbody tr th {
+        color: #00ff41 !important;
+    }
+
+    thead tr th {
+        color: #ffffff !important;
+    }
+
+    p, h1, h2, h3, h4, h5, h6, span, li {
+        color: #00ff41 !important;
+    }
